@@ -1,0 +1,15 @@
+{
+  "name": "problem_feed",
+  "version": "1.0.0",
+  "description": "A socket.io enabled web application that displays user-inputted comments in real time and stores them in an amazon DynamoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Zhang",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.1",
+    "socket.io": "^1.3.6"
+  }
+}

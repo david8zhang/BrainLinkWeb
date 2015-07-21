@@ -1,0 +1,22 @@
+{
+  "name": "Project",
+  "version": "0.0.0",
+  "homepage": "https://github.com/david8zhang/BrainLinkWeb",
+  "authors": [
+    "David Zhang <david8zhang@berkeley.edu>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

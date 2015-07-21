@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+	<style>
+		h1, form, .text {
+			text-align: center;
+			font-family: sans-serif;
+		}
+		.no_bullet{
+			list-style-type: none;
+		}
+		.center{
+			text-align: center;
+		}
+		.border{
+			border-radius: 3px;
+			border: 6px;
+			border-color: #00b6de;
+			border-style: solid;
+		} 
+		.sample_style{
+			font-family: sans-serif;
+			padding: 5px;
+			border: 3px;
+			border-radius: 3px;
+			border-style: solid;
+			border-color: #d84a4a;
+		}
+	</style>
+	<head>
+		
+
+	</head>
+	<body>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+		<!-- Latest compiled JavaScript -->
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+		<h1>Problem Solved</h1>
+			<div id="comment_feed" class="jumbotron border" style="padding: 2%; height:100%;">
+			</div> <br> <br>
+			
+			<div id="comment_input" class="center" >
+				<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width: 100%;"></textarea> <br>
+				<input type="button", id="add_status" value="Post Comment">
+			</div>
+
+		<script src="/jquery/dist/jquery.js"></script>
+		<script src="/socket.io/socket.io.js"></script>   		
+		<script>
+			var socket = io.connect('http://localhost:4200');
+			socket.on('connect', function(data){
+				socket.emit('join', 'Hello World from client');
+			});
+
+			socket.on('broad', function(data){
+				var new_comment=document.createElement("div");
+				new_comment.className="sample_style";
+				new_comment.innerHTML=data;
+
+				$('#comment_feed').append(new_comment);
+				$('#comment_feed').append('<br>');
+			});
+
+			$('#add_status').click(function(e){
+				// event.preventDefault();
+				var message = $('#comment_box').val();
+				socket.emit('messages', message);
+			});
+
+			function createComment(comment){
+				var outer_div = document.createElement('div');
+				outer_div.className = "media";
+
+				var inner_div = document.createElement('div');
+				inner_div.className = "media-left"
+
+				var a_tag = document.createElement('a');
+				a_tag.href = "#"
+
+				var img = document.createElement("img");
+				img.className="media-object";
+
+				var comment_text = document.createElement('div');
+				comment_text.innerHTML = comment;
+
+				var heading = documnet.createElement('h4');
+				heading.className="media-heading";
+				heading.innerHTML="Sample Comment";
+
+				inner_div.append(a_tag);
+				a_tag.append(img);
+
+				comment_text.append(heading);
+
+				outer_div.append(inner_div);
+				outer_div.append(comment_text);
+
+				return outer_div;
+			}
+		</script>
+	</body>
+</html>
