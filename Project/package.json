@@ -9,6 +9,7 @@
   "author": "David Zhang",
   "license": "ISC",
   "dependencies": {
+    "dynamodb-doc": "^1.0.0",
     "express": "^4.13.1",
     "socket.io": "^1.3.6"
   }

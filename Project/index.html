@@ -6,35 +6,50 @@
 			text-align: center;
 			font-family: sans-serif;
 		}
-		.no_bullet{
-			list-style-type: none;
-		}
 		.center{
-			text-align: center;
+			text-align:center;
 		}
-		.border{
+		.right{
+			text-align: right;
+		}
+		.left {
+			text-align:left;
+		}
+		.border-red{
 			border-radius: 3px;
-			border: 6px;
-			border-color: #00b6de;
+			border: 3px;
+			border-color: #ff4444;
+			border-style: solid;
+		} 
+		.border-green{
+			border-radius: 3px;
+			border: 3px;
+			border-color: #008000;
 			border-style: solid;
 		} 
 		.sample_style{
 			font-family: sans-serif;
 			padding: 5px;
-			border: 1px;
-			border-radius: 3px;
-			border-style: dashed;
-			border-color: #00b6de;
 			font-style: italic;
 		}
 		#contentWrap{
 			display: none;
+			width: 1000px;
+			margin: 0 auto;
 		} 
 		.small_style{
 			font-size: 10px;
 			font-style: bold;
 			color:#0099FF;
- 		}
+ 		} 
+ 		.left_col {
+		   float:left;
+		   width:500px;
+		}
+		.right_col {
+		   float:right;
+		   width:500px;
+		}
 	</style>
 	<head>
 		
@@ -60,22 +75,37 @@
 				</form>
 			</div>
 
-
+			<div id="trending_topics">
+				
+			</div>
 
 			<div id="contentWrap">
-				<div id="comment_feed" class="jumbotron border" style="padding: 2%; height:50%;">
-				</div> <br> <br>
 
-				<div id="enterTopic" class="center">
-					<textarea name="topic" id="topic_box" cols="30" rows="2" style="width: 50%"></textarea><br>
+				<div class="right_col">
+						<div id="comment_feed" class="jumbotron border-red" style="height:100%; width:500px; margin-left:10px;">
+						</div> <br>
+
+					<div id="comment_input" class="center">
+						<textarea name="topic" id="topic_box" cols="30" rows="2" style="width:100%; margin-left:10px;"></textarea><br>
+						<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width:100%; margin-left:10px;"></textarea> <br>
+						<input type="button", id="add_status" value="Post Comment">
+					</div>
+
 				</div>
-				
-				<div id="comment_input" class="center" >
-					<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width: 100%;"></textarea> <br>
+
+			<div class="left_col">
+					<div id="comment_feed" class="jumbotron border-green" style="height:100%; width:500px;">
+						</div> <br>
+				<div id="comment_input" class="center">
+					<textarea name="ideaTopic" id="idea_topic_box" cols="30" rows="2" style="width:100%; margin-right:10px;"></textarea><br>
+					<textarea name="ideaComment" id="idea_comment_box" cols="30" rows="4" style="width:100%; margin-right:10px;"></textarea> <br>
 					<input type="button", id="add_status" value="Post Comment">
 				</div>
+			</div> 
 
 			</div>
+
+
 
 
 		<script src="/jquery/dist/jquery.js"></script>

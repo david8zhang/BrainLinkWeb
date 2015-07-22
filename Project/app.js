@@ -5,8 +5,12 @@ var io = require('socket.io')(server);
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
 var nicknames = [];
-var hot_topics = [];
+var trending_topics = new Array();
 var glossary = require("glossary");
+var ddb = require('dynamodb').ddb({
+	accessKeyId:'AKIAJLWR63WQY7LH63PQ',
+	secretAccessKey: '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' }); 
+})
 
 app.use(express.static(__dirname + '/bower_components'));
 
@@ -44,22 +48,42 @@ io.on('connection', function(client){
 
 	client.on('messages', function(data){
 		//Upload it to the s3 bucket
-		var params = {Bucket:'problem-upload', Key: getDateTime().toString() + ".txt", Body: data.comment}
+/*		var params = {Bucket:'problem-upload', Key: getDateTime().toString() + ".txt", Body: data.comment}
 		s3.putObject(params, function(err, data){
 			if(err)
 				console.log(err)
 			else
 				console.log("Successfully uploaded data to the bucket!")
-		});
+		});*/
+
+		var dynamodb = new AWS.DynamoDB();
+		dynamodb.batchGetItem()
 		var data_array = data.split(":");
-		console.log(data_array);
+		var max = 0;
+		var hot_topics = [];
 		var topic = data_array[0];
 		var comment = data_array[1];
-		if(hot_topics[topic] === null){
-			hot_topics[topic] = 1;
+		if(trending_topics[topic] == null){
+			trending_topics[topic] = 1; 
 		} else {
-			hot_topics[topic] += 1; 
+			var count = trending_topics[topic];
+			count += 1; 
+			trending_topics[topic] = count;
 		}
+		for(var key in trending_topics){
+			if(trending_topics[key] >= max){
+				max = trending_topics[key];
+			}
+		}
+		for (var key in trending_topics){
+			if(trending_topics[key] >= max - 10){
+				if(hot_topics.indexOf(key) < 0){
+					hot_topics.push(key);
+				}
+			}
+		}
+		console.log(hot_topics);
+		console.log(trending_topics[topic]);
 		client.emit('broad', {msg: comment, nick: client.nickname, category:topic});
 		client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic});
 	})
