@@ -21,11 +21,20 @@
 		.sample_style{
 			font-family: sans-serif;
 			padding: 5px;
-			border: 3px;
+			border: 1px;
 			border-radius: 3px;
-			border-style: solid;
-			border-color: #d84a4a;
+			border-style: dashed;
+			border-color: #00b6de;
+			font-style: italic;
 		}
+		#contentWrap{
+			display: none;
+		} 
+		.small_style{
+			font-size: 10px;
+			font-style: bold;
+			color:#0099FF;
+ 		}
 	</style>
 	<head>
 		
@@ -42,13 +51,32 @@
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 		<h1>Problem Solved</h1>
-			<div id="comment_feed" class="jumbotron border" style="padding: 2%; height:100%;">
-			</div> <br> <br>
 			
-			<div id="comment_input" class="center" >
-				<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width: 100%;"></textarea> <br>
-				<input type="button", id="add_status" value="Post Comment">
+			<div id="nickWrap">
+				<p style="text-align:center; font-family:sans-serif">Enter a username</p>
+				<p id="nickError" style="text-align:center; font-family:sans-serif"></p>
+				<form id="setNick">
+					<input type="text" size="35" id="nickname"></input>
+				</form>
 			</div>
+
+
+
+			<div id="contentWrap">
+				<div id="comment_feed" class="jumbotron border" style="padding: 2%; height:50%;">
+				</div> <br> <br>
+
+				<div id="enterTopic" class="center">
+					<textarea name="topic" id="topic_box" cols="30" rows="2" style="width: 50%"></textarea><br>
+				</div>
+				
+				<div id="comment_input" class="center" >
+					<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width: 100%;"></textarea> <br>
+					<input type="button", id="add_status" value="Post Comment">
+				</div>
+
+			</div>
+
 
 		<script src="/jquery/dist/jquery.js"></script>
 		<script src="/socket.io/socket.io.js"></script>   		
@@ -61,48 +89,52 @@
 			socket.on('broad', function(data){
 				var new_comment=document.createElement("div");
 				new_comment.className="sample_style";
-				new_comment.innerHTML=data;
+				new_comment.innerHTML="<b>" + data.nick + "</b>" + ": " + data.msg;
+
+				var topic_display = document.createElement("h4");
+				topic_display.className = "small_style";
+				topic_display.innerHTML=data.category;
+
+				new_comment.appendChild(topic_display);
 
 				$('#comment_feed').append(new_comment);
 				$('#comment_feed').append('<br>');
 			});
+
+			document.getElementById("comment_box").addEventListener("keydown", function(e){
+				//Enter is pressed submit
+				if(e.keyCode == 13) {
+					e.preventDefault();
+					var message = $("#comment_box").val();
+					var topic = $("#topic_box").val();
+					socket.emit('messages', topic + ":" + message);
+					$("#comment_box").val("");
+					$("#topic_box").val("");
+					return false;
+				}
+			})
+
+			document.getElementById("nickname").addEventListener("keydown", function(e){
+				if(e.keyCode === 13){
+					e.preventDefault();
+					var nickname = $("#nickname").val();
+					socket.emit("new user", nickname, function(data){
+						if(data){
+							$('#nickWrap').hide();
+							$('#contentWrap').show();
+						} else {
+							$('#nickError').html("That username is already taken, please try again");
+						}
+					});
+					$("#nickname").val("");
+				}
+			})
 
 			$('#add_status').click(function(e){
 				// event.preventDefault();
 				var message = $('#comment_box').val();
 				socket.emit('messages', message);
 			});
-
-			function createComment(comment){
-				var outer_div = document.createElement('div');
-				outer_div.className = "media";
-
-				var inner_div = document.createElement('div');
-				inner_div.className = "media-left"
-
-				var a_tag = document.createElement('a');
-				a_tag.href = "#"
-
-				var img = document.createElement("img");
-				img.className="media-object";
-
-				var comment_text = document.createElement('div');
-				comment_text.innerHTML = comment;
-
-				var heading = documnet.createElement('h4');
-				heading.className="media-heading";
-				heading.innerHTML="Sample Comment";
-
-				inner_div.append(a_tag);
-				a_tag.append(img);
-
-				comment_text.append(heading);
-
-				outer_div.append(inner_div);
-				outer_div.append(comment_text);
-
-				return outer_div;
-			}
 		</script>
 	</body>
 </html>
