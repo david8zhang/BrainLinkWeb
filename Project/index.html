@@ -32,6 +32,18 @@
 			padding: 5px;
 			font-style: italic;
 		}
+		.selected_idea{
+			font-family: sans-serif;
+			padding: 5px;
+			font-style: italic;
+			background: #BCED91;
+		}
+		.selected_problem{
+			font-family: sans-serif;
+			padding: 5px;
+			font-style: italic;
+			background: #F08080;
+		}
 		#contentWrap{
 			display: none;
 			width: 1000px;
@@ -88,38 +100,46 @@
 					<div id="comment_input" class="center">
 						<textarea name="topic" id="topic_box" cols="30" rows="2" style="width:100%; margin-left:10px;"></textarea><br>
 						<textarea name="Comment" id="comment_box" cols="30" rows="4" style="width:100%; margin-left:10px;"></textarea> <br>
-						<input type="button", id="add_status" value="Post Comment">
 					</div>
 
 				</div>
 
 			<div class="left_col">
-					<div id="comment_feed" class="jumbotron border-green" style="height:100%; width:500px;">
+					<div id="idea_feed" class="jumbotron border-green" style="height:100%; width:500px;">
 						</div> <br>
 				<div id="comment_input" class="center">
 					<textarea name="ideaTopic" id="idea_topic_box" cols="30" rows="2" style="width:100%; margin-right:10px;"></textarea><br>
 					<textarea name="ideaComment" id="idea_comment_box" cols="30" rows="4" style="width:100%; margin-right:10px;"></textarea> <br>
-					<input type="button", id="add_status" value="Post Comment">
 				</div>
 			</div> 
 
 			</div>
 
-
-
-
 		<script src="/jquery/dist/jquery.js"></script>
 		<script src="/socket.io/socket.io.js"></script>   		
 		<script>
 			var socket = io.connect('http://localhost:4200');
+			var word_array = [];
 			socket.on('connect', function(data){
 				socket.emit('join', 'Hello World from client');
 			});
 
 			socket.on('broad', function(data){
+				var id = getDateTime().toString();
 				var new_comment=document.createElement("div");
+				new_comment.id = id;
 				new_comment.className="sample_style";
 				new_comment.innerHTML="<b>" + data.nick + "</b>" + ": " + data.msg;
+				new_comment.addEventListener("click", function(){
+					if(word_array.length > 0){
+						console.log(word_array[0]);
+						var solution = document.createElement("div");
+						solution.innerHTML = word_array[0];
+						document.getElementById(id).appendChild(solution);
+						new_comment.className="selected_problem";
+						word_array = [];
+					}
+				})
 
 				var topic_display = document.createElement("h4");
 				topic_display.className = "small_style";
@@ -131,6 +151,25 @@
 				$('#comment_feed').append('<br>');
 			});
 
+			socket.on('ideas', function(data){
+
+				var new_idea = document.createElement('div');
+				new_idea.className = "sample_style";
+				new_idea.innerHTML=data.msg;
+				new_idea.addEventListener("click", function(){
+					new_idea.className ='selected_idea';
+					word_array.push(data.msg);
+				})
+				var topic_display = document.createElement("h4");
+				topic_display.className="small_style";
+				topic_display.innerHTML=data.category;
+
+				new_idea.appendChild(topic_display);
+
+				$("#idea_feed").append(new_idea);
+				$("#idea_feed").append("<br>");
+			})
+
 			document.getElementById("comment_box").addEventListener("keydown", function(e){
 				//Enter is pressed submit
 				if(e.keyCode == 13) {
@@ -141,6 +180,18 @@
 					$("#comment_box").val("");
 					$("#topic_box").val("");
 					return false;
+				}
+			})
+
+			document.getElementById("idea_comment_box").addEventListener("keydown", function(e){
+				if(e.keyCode == 13){
+					e.preventDefault();
+					var message = $("#idea_comment_box").val();
+					var idea_topic = $("#idea_topic_box").val();
+					socket.emit('ideas', idea_topic + ":" + message);
+					$("#idea_comment_box").val("");
+					$("#idea_topic_box").val("");
+					return false; 
 				}
 			})
 
@@ -165,6 +216,30 @@
 				var message = $('#comment_box').val();
 				socket.emit('messages', message);
 			});
+
+			function getDateTime(){
+				var date = new Date();
+
+			    var hour = date.getHours();
+			    hour = (hour < 10 ? "0" : "") + hour;
+
+			    var min  = date.getMinutes();
+			    min = (min < 10 ? "0" : "") + min;
+
+			    var sec  = date.getSeconds();
+			    sec = (sec < 10 ? "0" : "") + sec;
+
+			    var year = date.getFullYear();
+
+			    var month = date.getMonth() + 1;
+			    month = (month < 10 ? "0" : "") + month;
+
+			    var day  = date.getDate();
+			    day = (day < 10 ? "0" : "") + day;
+
+			    return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
+			}
+
 		</script>
 	</body>
 </html>

@@ -7,10 +7,6 @@ var s3 = new AWS.S3();
 var nicknames = [];
 var trending_topics = new Array();
 var glossary = require("glossary");
-var ddb = require('dynamodb').ddb({
-	accessKeyId:'AKIAJLWR63WQY7LH63PQ',
-	secretAccessKey: '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' }); 
-})
 
 app.use(express.static(__dirname + '/bower_components'));
 
@@ -56,8 +52,8 @@ io.on('connection', function(client){
 				console.log("Successfully uploaded data to the bucket!")
 		});*/
 
-		var dynamodb = new AWS.DynamoDB();
-		dynamodb.batchGetItem()
+		
+		
 		var data_array = data.split(":");
 		var max = 0;
 		var hot_topics = [];
@@ -86,6 +82,13 @@ io.on('connection', function(client){
 		console.log(trending_topics[topic]);
 		client.emit('broad', {msg: comment, nick: client.nickname, category:topic});
 		client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic});
+	})
+	
+	client.on("ideas", function(data){
+		var idea_array = data.split(":");
+		var topic = idea_array[0];
+		var comment = idea_array[1];
+		client.emit('ideas', {msg: comment, category:topic})
 	})
 })
 
