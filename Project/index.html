@@ -87,10 +87,6 @@
 				</form>
 			</div>
 
-			<div id="trending_topics">
-				
-			</div>
-
 			<div id="contentWrap">
 
 				<div class="right_col">
@@ -120,6 +116,8 @@
 		<script>
 			var socket = io.connect('http://localhost:4200');
 			var word_array = [];
+			var hot_topics = [];
+
 			socket.on('connect', function(data){
 				socket.emit('join', 'Hello World from client');
 			});
@@ -168,6 +166,10 @@
 
 				$("#idea_feed").append(new_idea);
 				$("#idea_feed").append("<br>");
+			})
+
+			socket.on("trending", function(data){
+				hot_topics = data;
 			})
 
 			document.getElementById("comment_box").addEventListener("keydown", function(e){

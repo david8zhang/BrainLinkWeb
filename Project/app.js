@@ -1,12 +1,23 @@
 var express = require('express');
 var app = express();
+
+//Socket.io packages
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+
+//AWS packages
 var AWS = require('aws-sdk');
 var s3 = new AWS.S3();
+var DOC = require('dynamodb-doc');
+AWS.config.update({region: 'us-west-2'});
+var docClient = new DOC.DynamoDB();
+
+//Public variable arrays for storing nicknames and trending topics
 var nicknames = [];
 var trending_topics = new Array();
+var hot_topics = [];
 var glossary = require("glossary");
+
 
 app.use(express.static(__dirname + '/bower_components'));
 
@@ -43,22 +54,28 @@ io.on('connection', function(client){
 	})
 
 	client.on('messages', function(data){
-		//Upload it to the s3 bucket
-/*		var params = {Bucket:'problem-upload', Key: getDateTime().toString() + ".txt", Body: data.comment}
-		s3.putObject(params, function(err, data){
-			if(err)
-				console.log(err)
-			else
-				console.log("Successfully uploaded data to the bucket!")
-		});*/
-
-		
 		
 		var data_array = data.split(":");
 		var max = 0;
-		var hot_topics = [];
+		var displayed_comments = [];
 		var topic = data_array[0];
 		var comment = data_array[1];
+
+		//Upload this stuff to the DynamoDB
+		var params = {};
+		params.TableName = "test-uploads";
+		params.Item = {topic: topic, commentID: topic, body: comment};
+		docClient.putItem(params, function(err, data){
+			if(err){
+				console.log(err, err.stack);
+			} else {
+				console.log(data);
+			}
+		})
+
+
+
+		//Logic for determining trending topics
 		if(trending_topics[topic] == null){
 			trending_topics[topic] = 1; 
 		} else {
@@ -78,6 +95,18 @@ io.on('connection', function(client){
 				}
 			}
 		}
+		for(i = 0; i < hot_topics.length; i++){
+			var getParams = {};
+			getParams.TableName = "test-uploads";
+			getParams.Key = {commentID: hot_topics[i]};
+			console.log(docClient.getItem(getParams, function(err, data){
+				if(err){
+					console.log(err, err.stack);
+				} else {
+					console.log(data);
+				}
+			}))
+		}
 		console.log(hot_topics);
 		console.log(trending_topics[topic]);
 		client.emit('broad', {msg: comment, nick: client.nickname, category:topic});
@@ -90,6 +119,7 @@ io.on('connection', function(client){
 		var comment = idea_array[1];
 		client.emit('ideas', {msg: comment, category:topic})
 	})
+
 })
 
 function getDateTime(){
