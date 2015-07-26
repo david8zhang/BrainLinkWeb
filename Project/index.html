@@ -89,6 +89,12 @@
 
 			<div id="contentWrap">
 
+				<div id="trending_box">
+					<div id="trending_feed" class="jumbotron border-red" style="height:100%; width:1000px; margin-left:10px;">
+						<div id="trending_topic1"></div>
+					</div> <br>
+				</div>
+
 				<div class="right_col">
 						<div id="comment_feed" class="jumbotron border-red" style="height:100%; width:500px; margin-left:10px;">
 						</div> <br>
@@ -130,7 +136,6 @@
 				new_comment.innerHTML="<b>" + data.nick + "</b>" + ": " + data.msg;
 				new_comment.addEventListener("click", function(){
 					if(word_array.length > 0){
-						console.log(word_array[0]);
 						var solution = document.createElement("div");
 						solution.innerHTML = word_array[0];
 						document.getElementById(id).appendChild(solution);
@@ -139,15 +144,21 @@
 					}
 				})
 
+				var trending_topic = document.createElement("div");
+				trending_topic.className = "sample_style";
+				trending_topic.innerHTML = "<b>" + data.hot + "</b>"; 
+
 				var topic_display = document.createElement("h4");
 				topic_display.className = "small_style";
 				topic_display.innerHTML=data.category;
 
 				new_comment.appendChild(topic_display);
 
+				document.getElementById('trending_topic1').innerHTML = data.hot;
 				$('#comment_feed').append(new_comment);
 				$('#comment_feed').append('<br>');
 			});
+
 
 			socket.on('ideas', function(data){
 

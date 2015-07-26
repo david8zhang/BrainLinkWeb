@@ -16,6 +16,7 @@ var docClient = new DOC.DynamoDB();
 var nicknames = [];
 var trending_topics = new Array();
 var hot_topics = [];
+var dataArray = [];
 var glossary = require("glossary");
 
 
@@ -74,7 +75,6 @@ io.on('connection', function(client){
 		})
 
 
-
 		//Logic for determining trending topics
 		if(trending_topics[topic] == null){
 			trending_topics[topic] = 1; 
@@ -95,22 +95,16 @@ io.on('connection', function(client){
 				}
 			}
 		}
-		for(i = 0; i < hot_topics.length; i++){
-			var getParams = {};
-			getParams.TableName = "test-uploads";
-			getParams.Key = {commentID: hot_topics[i]};
-			console.log(docClient.getItem(getParams, function(err, data){
-				if(err){
-					console.log(err, err.stack);
-				} else {
-					console.log(data);
-				}
-			}))
-		}
-		console.log(hot_topics);
-		console.log(trending_topics[topic]);
-		client.emit('broad', {msg: comment, nick: client.nickname, category:topic});
-		client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic});
+		var trending;
+
+
+		//TODO: Figure out a way to show more than one top trending topic in the trending topics box
+		getData(function(data){
+			console.log("test: " + JSON.stringify(data))
+			client.emit('broad', {msg: comment, nick: client.nickname, category:topic, hot: JSON.stringify(data)});
+			client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic, hot:JSON.stringify(data)});
+		})
+		
 	})
 	
 	client.on("ideas", function(data){
@@ -143,6 +137,22 @@ function getDateTime(){
     day = (day < 10 ? "0" : "") + day;
 
     return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
+}
+
+function getData(callback){
+		for(i = 0; i < hot_topics.length; i++){
+		var getParams = {};
+		var trending = "";
+		getParams.TableName = "test-uploads";
+		getParams.Key = {commentID: hot_topics[i]};
+		docClient.getItem(getParams, function(err, data){
+			if(err){
+				console.log(err, err.stack);
+			} else {
+				callback(data);
+			}
+		});
+	}
 }
 
 console.log("server listening on port 4200");
