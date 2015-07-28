@@ -134,7 +134,9 @@
 				new_comment.id = id;
 				new_comment.className="sample_style";
 				new_comment.innerHTML="<b>" + data.nick + "</b>" + ": " + data.msg;
-				new_comment.addEventListener("click", function(){
+
+				//Linking logic, for future reference				
+/*				new_comment.addEventListener("click", function(){
 					if(word_array.length > 0){
 						var solution = document.createElement("div");
 						solution.innerHTML = word_array[0];
@@ -142,7 +144,7 @@
 						new_comment.className="selected_problem";
 						word_array = [];
 					}
-				})
+				})*/
 
 				var trending_topic = document.createElement("div");
 				trending_topic.className = "sample_style";
@@ -155,8 +157,9 @@
 				new_comment.appendChild(topic_display);
 
 				document.getElementById('trending_topic1').innerHTML = data.hot;
-				$('#comment_feed').append(new_comment);
-				$('#comment_feed').append('<br>');
+				//Going to stop apending things to the comment box now
+/*				$('#comment_feed').append(new_comment);
+				$('#comment_feed').append('<br>');*/
 			});
 
 

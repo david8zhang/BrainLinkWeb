@@ -89,7 +89,7 @@ io.on('connection', function(client){
 			}
 		}
 		for (var key in trending_topics){
-			if(trending_topics[key] >= max - 10){
+			if(trending_topics[key] >= max){
 				if(hot_topics.indexOf(key) < 0){
 					hot_topics.push(key);
 				}
@@ -100,9 +100,13 @@ io.on('connection', function(client){
 
 		//TODO: Figure out a way to show more than one top trending topic in the trending topics box
 		getData(function(data){
+			var trending;
+			jsonString = JSON.parse(JSON.stringify(data));
+			trending = jsonString["Item"].topic + ": " + jsonString["Item"].body;
 			console.log("test: " + JSON.stringify(data))
-			client.emit('broad', {msg: comment, nick: client.nickname, category:topic, hot: JSON.stringify(data)});
-			client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic, hot:JSON.stringify(data)});
+
+			client.emit('broad', {msg: comment, nick: client.nickname, category:topic, hot: trending});
+			client.broadcast.emit('broad', {msg:comment, nick:client.nickname, category: topic, hot:trending});
 		})
 		
 	})
@@ -138,6 +142,7 @@ function getDateTime(){
 
     return year + ":" + month + ":" + day + ":" + hour + ":" + min + ":" + sec;
 }
+
 
 function getData(callback){
 		for(i = 0; i < hot_topics.length; i++){
